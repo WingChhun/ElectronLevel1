@@ -85,8 +85,24 @@ function createWindow() {
                     }
                 }
             ]
+        }, {
+            label: "Developer",
+            submenu: [
+                {
+                    label: "Toggle Developer Tools",
+                    accelerator: process.platform === "darwin"
+                        ? 'Alt+Command+I'
+                        : "Ctrl+Shift+I",
+                    click() {
+                        mainWindow
+                            .webContents
+                            .openDevTools()
+                    }
+                }
+            ]
         }
     ];
+
     //If macOS
     if (process.platform === 'darwin') {
         template.unshift({
@@ -153,11 +169,6 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000')
 
     Menu.setApplicationMenu(menu);
-
-    // Open the DevTools.
-    mainWindow
-        .webContents
-        .openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
