@@ -1,5 +1,6 @@
 // Modules to control application life and create native browser window
-const {Menu, app, BrowserWindow} = require('electron')
+const {dialog, Menu, app, BrowserWindow} = require('electron')
+const fs = require('fs');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -13,7 +14,11 @@ function createWindow() {
             label: "File",
             submenu: [
                 {
-                    label: "Open File"
+                    label: "Open File",
+                    accelerator: "CmdOrCtrl+O",
+                    click() {
+                        openFile();
+                    }
                 }, {
                     label: "Open Folder"
                 }
@@ -203,3 +208,27 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+function openFile() {
+
+    const files = dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+        filters: [
+            {
+                name: "Markdown",
+                extensions: ['md', 'markdown', 'txt']
+            }
+        ]
+    });
+
+    if (!files) {
+        return; 
+    }
+
+    const file = files[0];
+    const fileContent = fs
+        .readFileSync(file)
+        .toString();
+
+    console.log(fileContent);
+}
