@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, dialog, Menu } = require('electron');
+const {app, BrowserWindow, dialog, Menu} = require('electron');
 const fs = require('fs');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -7,177 +7,233 @@ const fs = require('fs');
 let mainWindow;
 
 function createWindow() {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+    // Create the browser window.
+    mainWindow = new BrowserWindow({width: 1200, height: 800});
 
-  // and load the index.html of the app.
-  mainWindow.loadURL('http://localhost:3000');
+    // and load the index.html of the app.
+    mainWindow.loadURL('http://localhost:3000');
 
-  const template = [
-    {
-      label: 'File',
-      submenu: [
+    const template = [
         {
-          label: 'Open File',
-          accelerator: 'CmdOrCtrl+O',
-          click() {
-            openFile();
-          }
-        },
-        {
-          label: 'Open Folder'
+            label: 'File',
+            submenu: [
+                {
+                    label: 'Open File',
+                    accelerator: 'CmdOrCtrl+O',
+                    click() {
+                        openFile();
+                    }
+                }, {
+                    label: 'Open Folder'
+                }
+            ]
+        }, {
+            label: 'Edit',
+            submenu: [
+                {
+                    role: 'undo'
+                }, {
+                    role: 'redo'
+                }, {
+                    type: 'separator'
+                }, {
+                    role: 'cut'
+                }, {
+                    role: 'copy'
+                }, {
+                    role: 'paste'
+                }, {
+                    role: 'pasteandmatchstyle'
+                }, {
+                    role: 'delete'
+                }, {
+                    role: 'selectall'
+                }
+            ]
+        }, {
+            label: 'View',
+            submenu: [
+                {
+                    role: 'reload'
+                }, {
+                    role: 'forcereload'
+                }, {
+                    role: 'toggledevtools'
+                }, {
+                    type: 'separator'
+                }, {
+                    role: 'resetzoom'
+                }, {
+                    role: 'zoomin'
+                }, {
+                    role: 'zoomout'
+                }, {
+                    type: 'separator'
+                }, {
+                    role: 'togglefullscreen'
+                }
+            ]
+        }, {
+            role: 'window',
+            submenu: [
+                {
+                    role: 'minimize'
+                }, {
+                    role: 'close'
+                }
+            ]
+        }, {
+            role: 'help',
+            submenu: [
+                {
+                    label: 'Learn More',
+                    click() {
+                        require('electron')
+                            .shell
+                            .openExternal('https://electronjs.org');
+                    }
+                }
+            ]
+        }, {
+            label: 'Developer',
+            submenu: [
+                {
+                    label: 'Toggle Developer Tools',
+                    accelerator: process.platform === 'darwin'
+                        ? 'Alt+Command+I'
+                        : 'Ctrl+Shift+I',
+                    click() {
+                        mainWindow
+                            .webContents
+                            .toggleDevTools();
+                    }
+                }
+            ]
         }
-      ]
-    },
-    {
-      label: 'Edit',
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' },
-        { role: 'pasteandmatchstyle' },
-        { role: 'delete' },
-        { role: 'selectall' }
-      ]
-    },
-    {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-        { type: 'separator' },
-        { role: 'resetzoom' },
-        { role: 'zoomin' },
-        { role: 'zoomout' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
-    },
-    {
-      role: 'window',
-      submenu: [{ role: 'minimize' }, { role: 'close' }]
-    },
-    {
-      role: 'help',
-      submenu: [
-        {
-          label: 'Learn More',
-          click() {
-            require('electron').shell.openExternal('https://electronjs.org');
-          }
-        }
-      ]
-    },
-    {
-      label: 'Developer',
-      submenu: [
-        {
-          label: 'Toggle Developer Tools',
-          accelerator:
-            process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-          click() {
-            mainWindow.webContents.toggleDevTools();
-          }
-        }
-      ]
-    }
-  ];
-
-  // If macOS
-  if (process.platform === 'darwin') {
-    template.unshift({
-      label: app.getName(),
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'services', submenu: [] },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' }
-      ]
-    });
-
-    // Edit menu
-    template[2].submenu.push(
-      { type: 'separator' },
-      {
-        label: 'Speech',
-        submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }]
-      }
-    );
-
-    // Window menu
-    template[4].submenu = [
-      { role: 'close' },
-      { role: 'minimize' },
-      { role: 'zoom' },
-      { type: 'separator' },
-      { role: 'front' }
     ];
-  }
 
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
+    // If macOS
+    if (process.platform === 'darwin') {
+        template.unshift({
+            label: app.getName(),
+            submenu: [
+                {
+                    role: 'about'
+                }, {
+                    type: 'separator'
+                }, {
+                    role: 'services',
+                    submenu: []
+                }, {
+                    type: 'separator'
+                }, {
+                    role: 'hide'
+                }, {
+                    role: 'hideothers'
+                }, {
+                    role: 'unhide'
+                }, {
+                    type: 'separator'
+                }, {
+                    role: 'quit'
+                }
+            ]
+        });
 
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+        // Edit menu
+        template[2]
+            .submenu
+            .push({
+                type: 'separator'
+            }, {
+                label: 'Speech',
+                submenu: [
+                    {
+                        role: 'startspeaking'
+                    }, {
+                        role: 'stopspeaking'
+                    }
+                ]
+            });
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-  });
+        // Window menu
+        template[4].submenu = [
+            {
+                role: 'close'
+            }, {
+                role: 'minimize'
+            }, {
+                role: 'zoom'
+            }, {
+                type: 'separator'
+            }, {
+                role: 'front'
+            }
+        ];
+    }
+
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+
+    // Open the DevTools. mainWindow.webContents.openDevTools() Emitted when the
+    // window is closed.
+    mainWindow.on('closed', function () {
+        // Dereference the window object, usually you would store windows in an array if
+        // your app supports multi windows, this is the time when you should delete the
+        // corresponding element.
+        mainWindow = null;
+    });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
+// This method will be called when Electron has finished initialization and is
+// ready to create browser windows. Some APIs can only be used after this event
+// occurs.
 app.on('ready', createWindow);
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+app.on('window-all-closed', function () {
+    // On OS X it is common for applications and their menu bar to stay active until
+    // the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
-app.on('activate', function() {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow();
-  }
+app.on('activate', function () {
+    // On OS X it's common to re-create a window in the app when the dock icon is
+    // clicked and there are no other windows open.
+    if (mainWindow === null) {
+        createWindow();
+    }
 });
 
 // In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-// Open File
+// code. You can also put them in separate files and require them here. Open
+// File
 function openFile() {
-  // Opens file dialog looking for markdown
-  const files = dialog.showOpenDialog(mainWindow, {
-    properties: ['openFile'],
-    filters: [{ name: 'Markdown', extensions: ['md', 'markdown', 'txt'] }]
-  });
+    // Opens file dialog looking for markdown
+    const files = dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+        filters: [
+            {
+                name: 'Markdown',
+                extensions: ['md', 'markdown', 'txt']
+            }
+        ]
+    });
 
-  // If no files
-  if (!files) return;
+    // If no files
+    if (!files) 
+        return;
+    
+    const file = files[0]; // Grabs first file path in array
+    // Loads file contents via path acquired via the dialog
+    const fileContent = fs
+        .readFileSync(file)
+        .toString();
 
-  const file = files[0]; // Grabs first file path in array
-  // Loads file contents via path acquired via the dialog
-  const fileContent = fs.readFileSync(file).toString();
-
-  // Send filedContent to renderer
-  mainWindow.webContents.send('new-file', fileContent);
+    // Send filedContent to renderer
+    mainWindow
+        .webContents
+        .send('new-file', fileContent);
 }
