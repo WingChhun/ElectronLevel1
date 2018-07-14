@@ -8,6 +8,7 @@ import "brace/mode/markdown";
 import "brace/theme/dracula";
 import "./App.css";
 
+const settings = window.require("electron-settings");
 const { ipcRenderer } = window.require("electron");
 
 class App extends Component {
@@ -15,7 +16,8 @@ class App extends Component {
     super();
 
     this.state = {
-      loadedFile: ""
+      loadedFile: "",
+      directory: settings.get("directory") || null
     };
 
     ipcRenderer.on("new-file", (event, fileContent) => {
@@ -26,6 +28,7 @@ class App extends Component {
       this.setState({
         directory: dir
       });
+      settings.set("directory", dir);
     });
   }
 
@@ -33,23 +36,29 @@ class App extends Component {
     return (
       <div className="App">
         <Header>Journal</Header>
-        <Split>
-          <CodeWindow>
-            <AceEditor
-              mode="markdown"
-              theme="dracula"
-              onChange={newContent => {
-                this.setState({ loadedFile: newContent });
-              }}
-              name="markdown_editor"
-              value={this.state.loadedFile}
-            />
-          </CodeWindow>
+        {this.state.directory ? (
+          <Split>
+            <CodeWindow>
+              <AceEditor
+                mode="markdown"
+                theme="dracula"
+                onChange={newContent => {
+                  this.setState({ loadedFile: newContent });
+                }}
+                name="markdown_editor"
+                value={this.state.loadedFile}
+              />
+            </CodeWindow>
 
-          <RenderedWindow>
-            <Markdown>{this.state.loadedFile}</Markdown>
-          </RenderedWindow>
-        </Split>
+            <RenderedWindow>
+              <Markdown>{this.state.loadedFile}</Markdown>
+            </RenderedWindow>
+          </Split>
+        ) : (
+          <LoadingMessage>
+            <h2>Press CmdORCtrl+O to open directory </h2>
+          </LoadingMessage>
+        )}
       </div>
     );
   }
@@ -104,4 +113,13 @@ const RenderedWindow = styled.div`
   a {
     color: #e54b4b;
   }
+`;
+
+const LoadingMessage = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  background-color: #191324;
 `;
