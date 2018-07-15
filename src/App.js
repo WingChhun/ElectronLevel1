@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import Markdown from "markdown-to-jsx";
 import AceEditor from "react-ace";
 import brace from "brace";
@@ -9,64 +9,86 @@ import "brace/theme/dracula";
 import "./App.css";
 
 const settings = window.require("electron-settings");
-const { ipcRenderer } = window.require("electron");
+const {ipcRenderer} = window.require("electron");
+const fs = window.require('fs');
 
 class App extends Component {
-  constructor() {
-    super();
 
-    this.state = {
-      loadedFile: "",
-      directory: settings.get("directory") || null
-    };
+    //TODO: Constructor
+    constructor() {
+        super();
 
-    ipcRenderer.on("new-file", (event, fileContent) => {
-      this.setState({ loadedFile: fileContent });
-    });
+        this.state = {
+            loadedFile: "",
+            directory: settings.get("directory") || null
+        };
 
-    ipcRenderer.on("new-dir", (event, filePaths, dir) => {
-      this.setState({
-        directory: dir
-      });
-      settings.set("directory", dir);
-    });
-  }
+        //** Store users directory on new-file or new-directory
+        ipcRenderer.on("new-file", (event, fileContent) => {
+            this.setState({loadedFile: fileContent});
+        });
 
-  render() {
-    return (
-      <div className="App">
-        <Header>Journal</Header>
-        {this.state.directory ? (
-          <Split>
-            <CodeWindow>
-              <AceEditor
-                mode="markdown"
-                theme="dracula"
-                onChange={newContent => {
-                  this.setState({ loadedFile: newContent });
-                }}
-                name="markdown_editor"
-                value={this.state.loadedFile}
-              />
-            </CodeWindow>
+        ipcRenderer.on("new-dir", (event, directory) => {
+            this.setState({directory});
 
-            <RenderedWindow>
-              <Markdown>{this.state.loadedFile}</Markdown>
-            </RenderedWindow>
-          </Split>
-        ) : (
-          <LoadingMessage>
-            <h2>Press CmdORCtrl+O to open directory </h2>
-          </LoadingMessage>
-        )}
-      </div>
-    );
-  }
+            //* Set directory that we are getting in settings */
+            settings.set("directory", directory);
+            this.loadAndReadFiles(directory);
+        });
+    }
+
+    loadAndReadFiles = directory => {
+
+        let filteredFiles = [];
+        let filesData = {};
+
+        fs.readdir(directory, (err, files) => {
+            filteredFiles = files.filter(file => file.includes(".md"));
+            filesData = filteredFiles.map(file => {
+                path : `${directory}/${file}`
+            });
+
+            //*Get directories set fileData in state
+            this.setState({filesData});
+        });
+    }
+    render() {
+        return (
+            <div className="App">
+                <Header>Journal</Header>
+                {this.state.directory
+                    ? (
+                        <Split>
+                            <CodeWindow>
+                                <AceEditor
+                                    mode="markdown"
+                                    theme="dracula"
+                                    onChange={newContent => {
+                                    this.setState({loadedFile: newContent});
+                                }}
+                                    name="markdown_editor"
+                                    value={this.state.loadedFile}/>
+                            </CodeWindow>
+
+                            <RenderedWindow>
+                                <Markdown>{this.state.loadedFile}</Markdown>
+                            </RenderedWindow>
+                        </Split>
+                    )
+                    : (
+                        <LoadingMessage>
+                            <h2>Press CmdORCtrl+O to open directory
+                            </h2>
+                        </LoadingMessage>
+                    )}
+            </div>
+        );
+    }
 }
 
 export default App;
 
-const Header = styled.header`
+const Header = styled.header `
   background-color: #191324;
   color: #75717c;
   font-size: 0.8rem;
@@ -81,18 +103,18 @@ const Header = styled.header`
   -webkit-app-region: drag;
 `;
 
-const Split = styled.div`
+const Split = styled.div `
   display: flex;
   height: 100vh;
 `;
 
-const CodeWindow = styled.div`
+const CodeWindow = styled.div `
   flex: 1;
   padding-top: 2rem;
   background-color: #191324;
 `;
 
-const RenderedWindow = styled.div`
+const RenderedWindow = styled.div `
   background-color: #191324;
   width: 35%;
   padding: 20px;
@@ -115,7 +137,7 @@ const RenderedWindow = styled.div`
   }
 `;
 
-const LoadingMessage = styled.div`
+const LoadingMessage = styled.div `
   height: 100vh;
   display: flex;
   justify-content: center;
