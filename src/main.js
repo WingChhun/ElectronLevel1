@@ -183,6 +183,13 @@ function createWindow() {
         mainWindow = null;
     });
 
+
+    //TODO: Install developer extensions
+
+    require('devtron')
+        .install();
+     
+
     mainWindow
         .webContents
         .openDevTools();
