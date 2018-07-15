@@ -17,7 +17,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "electron": "DEBUG=* && NODE_ENV=development &&electron . "
+    "electron": "electron . "
   },
   "devDependencies": {
     "electron": "^2.0.4",
