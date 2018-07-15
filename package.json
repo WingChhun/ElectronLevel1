@@ -20,6 +20,7 @@
     "electron": "electron . "
   },
   "devDependencies": {
+    "devtron": "^1.4.0",
     "electron": "^2.0.4",
     "electron-devtools-installer": "^2.2.4",
     "electron-react-devtools": "^0.5.3"
