@@ -62,23 +62,40 @@ class App extends Component {
             filesData = filteredFiles.map(file => ({path: `${directory}/${file}`}));
 
             //*Get directories set fileData in state
-            this.setState({filesData});
+            this.setState({
+                filesData
+            }, () => {
+                this.loadFile(0); //*Load first file of the array immediately if there is a directory
+            });
         });
 
     }
+
+    loadFile = index => {
+
+        const {filesData} = this.state;
+
+        const content = fs
+            .readFileSync(filesData[index].path)
+            .toString();
+
+        this.setState({loadedFile: content});
+
+    }
+
     render() {
         return (
-            <div className="App">
+            <AppWrap>
                 <Header>Journal</Header>
                 {this.state.directory
                     ? (
                         <Split>
-                            <div>
+                            <FilesWindow>
                                 {this
                                     .state
                                     .filesData
-                                    .map(file => <h1>{file.path}</h1>)}
-                            </div>
+                                    .map((file, index) => <button onClick={() => this.loadFile(index)}>{file.path}</button>)}
+                            </FilesWindow>
                             <CodeWindow>
                                 <AceEditor
                                     mode="markdown"
@@ -101,12 +118,37 @@ class App extends Component {
                             </h2>
                         </LoadingMessage>
                     )}
-            </div>
+            </AppWrap>
         );
     }
 }
 
 export default App;
+
+const AppWrap = styled.div `
+margin-top:23px;
+
+
+`;
+
+const FilesWindow = styled.div `
+
+background:#140f1d;
+border-right:solid 1px #302b3a;
+position:relative;
+width:20%;
+&:after
+{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  pointer-events:none;
+  box-shadow:-10px 0 20px rgba(0,0,0,0.3) inset;
+}
+`;
 
 const Header = styled.header `
   background-color: #191324;
