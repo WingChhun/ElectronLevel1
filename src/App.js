@@ -20,6 +20,7 @@ class App extends Component {
 
         this.state = {
             loadedFile: "",
+            filesData: [],
             directory: settings.get("directory") || null
         };
 
@@ -38,19 +39,17 @@ class App extends Component {
     }
 
     loadAndReadFiles = directory => {
-
         let filteredFiles = [];
         let filesData = {};
 
         fs.readdir(directory, (err, files) => {
             filteredFiles = files.filter(file => file.includes(".md"));
-            filesData = filteredFiles.map(file => {
-                path : `${directory}/${file}`
-            });
+            filesData = filteredFiles.map(file => ({path: `${directory}/${file}`}));
 
             //*Get directories set fileData in state
             this.setState({filesData});
         });
+
     }
     render() {
         return (
@@ -59,6 +58,12 @@ class App extends Component {
                 {this.state.directory
                     ? (
                         <Split>
+                            <div>
+                                {this
+                                    .state
+                                    .filesData
+                                    .map(file => <h1>{file.path}</h1>)}
+                            </div>
                             <CodeWindow>
                                 <AceEditor
                                     mode="markdown"
