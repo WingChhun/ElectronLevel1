@@ -18,13 +18,28 @@ class App extends Component {
     constructor() {
         super();
 
+        // ** On Load, if directory exists within User/applicationData/ then load that
+        // directory
+
         this.state = {
             loadedFile: "",
             filesData: [],
             directory: settings.get("directory") || null
         };
 
-        //** Store users directory on new-file or new-directory
+    }
+
+    componentWillMount()
+    {
+
+        const directory = settings.get('directory');
+
+        if (directory) {
+            this.loadAndReadFiles(directory);
+        }
+
+        // TODO: Handle ipcRenderer commuinication before mounting ** Store users
+        // directory on new-file or new-directory
         ipcRenderer.on("new-file", (event, fileContent) => {
             this.setState({loadedFile: fileContent});
         });
