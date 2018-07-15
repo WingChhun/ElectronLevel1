@@ -24,6 +24,7 @@ class App extends Component {
         this.state = {
             loadedFile: "",
             filesData: [],
+            activeIndex: 0,
             directory: settings.get("directory") || null
         };
 
@@ -71,6 +72,16 @@ class App extends Component {
 
     }
 
+    changeFile = index => () => {
+        const {activeIndex} = this.state;
+
+        //*If new file, save current File then load new File
+        if (index !== activeIndex) {
+            this.saveFile();
+            this.loadFile();
+        }
+    }
+
     loadFile = index => {
 
         const {filesData} = this.state;
@@ -79,7 +90,23 @@ class App extends Component {
             .readFileSync(filesData[index].path)
             .toString();
 
-        this.setState({loadedFile: content});
+        //*Set file content and activeIndex
+        this.setState({loadedFile: content, activeIndex: index});
+
+    }
+
+    //Todo : Change a file, save the file
+    saveFile = () => {
+
+        const {activeIndex, loadedFile, filesData} = this.state;
+
+        //writeFile() accepts path and content
+        fs.writeFile(filesData[activeIndex].path, loadedFile, err => {
+            if (err) 
+                return console.log(err);
+            
+            console.log("Saved file");
+        })
 
     }
 
@@ -94,7 +121,7 @@ class App extends Component {
                                 {this
                                     .state
                                     .filesData
-                                    .map((file, index) => <button onClick={() => this.loadFile(index)}>{file.path}</button>)}
+                                    .map((file, index) => <button onClick={this.changeFile(index)}>{file.path}</button>)}
                             </FilesWindow>
                             <CodeWindow>
                                 <AceEditor
